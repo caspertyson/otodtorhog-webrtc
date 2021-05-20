@@ -2,14 +2,38 @@ const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
 let myPeer = new Peer(undefined, {
     host:'/',
-    port: '3001'
+    port: '3001',
+    debug: true,
+    config: { 'iceServers': [
+        { 'url': 'stun:stun.l.google.com:19302' },  
+        { url: 'stun:stun01.sipphone.com' },
+    { url: 'stun:stun.ekiga.net' },
+    { url: 'stun:stunserver.org' },
+    { url: 'stun:stun.softjoys.com' },
+    { url: 'stun:stun.voiparound.com' },
+    { url: 'stun:stun.voipbuster.com' },
+    { url: 'stun:stun.voipstunt.com' },
+    { url: 'stun:stun.voxgratia.org' },
+    { url: 'stun:stun.xten.com' },
+    {
+        url: 'turn:192.158.29.39:3478?transport=udp',
+        credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+        username: '28224511:1379330808'
+    },
+    {
+    url: 'turn:192.158.29.39:3478?transport=tcp',
+    credential: 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+    username: '28224511:1379330808'
+    }
+
+    ]}
 })
 const startButton = document.getElementById('start-button')
 const readyButton = document.createElement('button')
 readyButton.id = "readyButton"
-readyButton.textContent = "Ready?"
+readyButton.textContent = "Ready?" 
 const scoreContainer = document.getElementById('score-container')
-const name = prompt("What is your name?")
+const name = prompt("What is your name?") 
 const playersReady = document.createElement('h3')
 let noOfPlayers = document.createElement('h3')
 scoreContainer.appendChild(playersReady)
@@ -21,12 +45,12 @@ startButton.disabled = true
 
 
 //ID for every client
-const clientArray1 = ["Host", "Matthew", "Mark", "Luke"]
+let clientArray1 = ["Host"] //array for people
 
 let clientArray = []
 let ID = 0
 
-readyButton.addEventListener('click', () =>{
+readyButton.addEventListener('click', () =>{ //sends user name, and player no. (order which joined)
     socket.emit('user-ready', name, ID)
     readyButton.textContent = "Waiting for host to Start"
     readyButton.disabled = true
@@ -36,7 +60,7 @@ socket.on('ready-user', (name, ID) => {
     let i = parseInt(noOfPlayers.textContent)
     i++
     noOfPlayers.textContent = i
-    if(i == 3){
+    if(i == clientArray1.length - 1){
         startButton.disabled = false
     }
 })
@@ -62,19 +86,17 @@ navigator.mediaDevices.getUserMedia({
             if(!!document.getElementById('start-button')){
                 startButton.parentNode.removeChild(startButton)
                 scoreContainer.appendChild(readyButton)
-                noOfPlayers.parentNode.removeChild(noOfPlayers)
+                noOfPlayers.parentNode.removeChild(noOfPlayers) //removes stuff not needed for players, but needed for host
                 playersReady.parentNode.removeChild(playersReady)
             }
             addVideoStream(video, userVideoStream)
 
         })
         ID = ID + 1
-        console.log(ID)
     })
 
     socket.on('user-connected', userId => {
         connectToNewUser(userId, stream)
-        clientArray.push(userId)
 
     })
 })
@@ -82,8 +104,6 @@ socket.on('user-disconnected', userId => {
     if (peers[userId]) peers[userId].close()
 })
 myPeer.on('open', id =>{
-    clientArray.push(id)
-    //ID = id
     socket.emit('join-room', ROOM_ID, id)
 })
 
