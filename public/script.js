@@ -28,6 +28,7 @@ const myPeer = new Peer(undefined, {
 
     ]}
 })
+
 let x
 fetch(`/database.json`)
     .then(response => response.json())
@@ -63,7 +64,12 @@ nextQuestion.addEventListener('click', () => {
 })
 socket.on('question-next', () => {
     state.animate_nq()
-
+    setTimeout(function(){
+        addImageLeft("http://commons.wikimedia.org/wiki/Special:FilePath/President%20Barack%20Obama.jpg")
+    }, 2500)
+    setTimeout(function(){
+        addImageRight("http://commons.wikimedia.org/wiki/Special:FilePath/Amazon%20Kindle%203.JPG")
+    }, 2500)
     const players = document.getElementsByClassName('player')
     for(i = 0; i < players.length; i++){
         players[i].textContent = clientArray1[i + 1]
@@ -85,8 +91,6 @@ buzzer.addEventListener('click', () => {
 })
 let playerClickedNo = 0
 socket.on('clicked-buzzer', identity => {
-    addImageLeft("http://commons.wikimedia.org/wiki/Special:FilePath/President%20Barack%20Obama.jpg")
-    addImageRight("http://commons.wikimedia.org/wiki/Special:FilePath/Amazon%20Kindle%203.JPG")
     const buzzedPlayer = document.getElementById(identity)
     if(playerClickedNo == 0){
         playerClickedNo++
@@ -265,12 +269,16 @@ function connectToNewUser(userId, stream) {
 
 function addImageLeft(url){
     let img = document.createElement('img')
-    img.src = url
+    let downloadingImage = new Image()
+    downloadingImage.onload = function(){
+        img.src = this.src
+    }
+    downloadingImage.src = url
     img.style.width = "200px"
     img.style.height = "200px"
     img.style.zIndex = "99"
     img.style.position = "absolute"
-    img.style.marginLeft = "445px"
+    img.style.marginLeft = "440px"
     img.style.marginTop = "75px"
     img.style.borderRadius = "5px"
     document.getElementById('body').appendChild(img)
@@ -278,7 +286,11 @@ function addImageLeft(url){
 
 function addImageRight(url){
     let img = document.createElement('img')
-    img.src = url
+    let downloadingImage = new Image()
+    downloadingImage.onload = function(){
+        img.src = this.src
+    }
+    downloadingImage.src = url
     img.style.width = "200px"
     img.style.height = "200px"
     img.style.zIndex = "99"
@@ -289,7 +301,7 @@ function addImageRight(url){
     document.getElementById('body').appendChild(img)
 }
 
-//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //bedir's STUFF
 
 

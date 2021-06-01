@@ -1,10 +1,9 @@
 const express = require('express')
-const app = express();
+const app = express()
 const server = require('http').Server(app)
 const io = require('socket.io')(server)
 const { v4:uuidV4 } = require('uuid')
 const fs = require('fs')
-//const json = require("/Users/caspertyson/Downloads/data.json")
 
 //make every file in the /dashboard and /questions folders publicly accessable
 app.use(express.static('./dashboard'))
