@@ -1,0 +1,15 @@
+.option{
+	display: flex;
+	padding: 0;
+	margin: 0;
+}
+
+.option *{
+	margin: 2px;
+}
+
+.overflow{
+	max-height: 300px;
+	max-width: 600px;
+	overflow: auto;
+}

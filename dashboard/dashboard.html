@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Dashboard</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+	<script defer src="dashboard.js"></script>
+</head>
+<body>
+	<section id="game-selection">
+		<label>Select Game</label>
+		<button v-for="game in games" v-on:click="changeGame(game)">{{game}}</button>
+	</section>
+
+	<section id="games">
+		<section id="AnswerSmash" v-if="currentGame">
+			<h1>Answer Smash</h1>
+			<h3>Pick Categories:</h3>
+			Overlap
+			<select v-model="category1"><option v-bind:value="category" v-for="category in Object.keys(this.queries)">{{category}}</option></select>
+			with
+			<select v-model="category2"><option v-bind:value="category" v-for="category in Object.keys(this.queries)">{{category}}</option></select>
+	
+			<p>{{category1}} and {{category2}}</p>
+			<br><br>
+			<label>Choose Overlap:</label>
+			<input type="number" v-model="overlap" value="3" min="1" max="5">
+			<br>
+			<button v-on:click="runQueries">Run Queries</button>
+		</section>
+		<section id="WhereIsKazakhstan" v-if="currentGame">
+			<h1>Where Is Kazakhstan?</h1>
+			<button v-on:click="runQueries">GO</button>
+		</section>
+		<Section id="DistinctlyAverage" v-if="currentGame">
+			<h1>Distinctly Average</h1>
+		</Section>
+	</section>
+
+	<section id="results">
+		<h2>Results: {{options.length}}</h2>
+		<div class="overflow">
+			<result 
+				v-for="item in options"
+				v-bind:option="item"
+			></result>
+		</div>
+	</section>
+
+	<section id="selected">
+		<h2>Selected: {{selected.length}}</h2>
+		<div class="overflow">
+			<selection 
+				v-for="item in selected"
+				v-bind:option="item"
+			></selection>
+		</div>
+		<button v-on:click="save()">Save {{selected.length}} items</button>
+	</section>
+</body>
+</html>
