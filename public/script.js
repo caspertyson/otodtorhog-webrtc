@@ -37,6 +37,8 @@ fetch(`/database.json`)
     })
 
 
+
+
 let state = {}
 
 let playersReader = 0
@@ -53,23 +55,87 @@ nextQuestion.textContent = "Next Question"
 nextQuestion.id = "next_question"
 const playerName = document.getElementById('name-user')
 
+let countRounds = 0
+
+let audio = new Audio("clapping.mp3")
+let introMusic = new Audio("introMusic.mp3")
+let buzzerAudio = new Audio("buzzer.mp3")
+
+function playBuzzer(){
+    buzzerAudio.pause()
+    buzzerAudio.src = "buzzer.mp3"
+    buzzerAudio.play()
+
+}
+function playIntro(){
+    introMusic.play()
+    setInterval(function() {
+        introMusic.pause()
+        introMusic.src = "introMusic.mp3"
+    }, 7000)
+}
+function playClapping(){
+    audio.pause()
+    audio.src = "clapping.mp3"
+    audio.play()
+
+}
+
 startButton.disabled = true
 let buzzerArray = []
 let clientArray = ["host"]
 let clientArray1 = ["Host"] 
 let ID = 0
+
+
+
 //NEXT QUESTION
 nextQuestion.addEventListener('click', () => {
+    // let x = 0
+    // let object = {};
+    // if(x < 5){
+    //     object ={
+    //         tjg: answer
+    //         g: 
+    //     }
+    // }
+    // else if( x < 10){
+    //     object = {
+
+    //     }
+
+    // }
+    // x++
     socket.emit('next-question')
 })
 socket.on('question-next', () => {
-    state.animate_nq()
-    setTimeout(function(){
-        addImageLeft("http://commons.wikimedia.org/wiki/Special:FilePath/President%20Barack%20Obama.jpg")
-    }, 2500)
-    setTimeout(function(){
-        addImageRight("http://commons.wikimedia.org/wiki/Special:FilePath/Amazon%20Kindle%203.JPG")
-    }, 2500)
+    let images = document.getElementsByTagName('img')
+
+    if(countRounds == 5){
+        if(images[0] != null){
+            images[0].parentNode.removeChild(images[0])
+            images[0].parentNode.removeChild(images[0])
+        }
+        afterq6()
+    }
+    else{
+        if(images[0] != null){
+            images[0].parentNode.removeChild(images[0])
+            images[0].parentNode.removeChild(images[0])
+        }
+        state.animate_nq()
+
+        setTimeout(function(){
+            addImageLeft("http://commons.wikimedia.org/wiki/Special:FilePath/President%20Barack%20Obama.jpg")
+        }, 2500)
+        setTimeout(function(){
+            addImageRight("http://commons.wikimedia.org/wiki/Special:FilePath/Amazon%20Kindle%203.JPG")
+        }, 2500)
+
+    }
+    countRounds++
+
+
     const players = document.getElementsByClassName('player')
     for(i = 0; i < players.length; i++){
         players[i].textContent = clientArray1[i + 1]
@@ -87,24 +153,24 @@ socket.on('question-next', () => {
 buzzer.addEventListener('click', () => {
     socket.emit('buzzer-clicked', ID)
     buzzer.disabled = true
-
 })
 let playerClickedNo = 0
 socket.on('clicked-buzzer', identity => {
+    playBuzzer()
     const buzzedPlayer = document.getElementById(identity)
     if(playerClickedNo == 0){
         playerClickedNo++
-        buzzedPlayer.textContent = buzzedPlayer.textContent + ' 1'
-        buzzedPlayer.style.color = 'red'
+        buzzedPlayer.textContent = buzzedPlayer.textContent + '      1'
+        buzzedPlayer.style.color = 'white'
     }
     else if(playerClickedNo == 1){
         playerClickedNo++
-        buzzedPlayer.textContent = buzzedPlayer.textContent + ' 2'
-        buzzedPlayer.style.color = 'red'    }
+        buzzedPlayer.textContent = buzzedPlayer.textContent + '      2'
+        buzzedPlayer.style.color = 'white'    }
     else if(playerClickedNo == 2){
         playerClickedNo++
-        buzzedPlayer.textContent = buzzedPlayer.textContent + ' 3'
-        buzzedPlayer.style.color = 'red'    }
+        buzzedPlayer.textContent = buzzedPlayer.textContent + '      3'
+        buzzedPlayer.style.color = 'white'    }
 
 })
 //READY BUTTON
@@ -124,7 +190,13 @@ socket.on('ready-user', (name, ID) => {
     startButton.textContent = "Waiting for Players. " + playersReader + " player/s is/are ready."
     if(playersReader == (clientArray.length - 1)){
         startButton.disabled = false
-        startButton.textContent = "Start Game"
+        startButton.textContent = "START"
+        startButton.style.background = "url(LOGO.jpg)"
+        startButton.style.backgroundPosition = "center"
+        startButton.style.height = "100px"
+        startButton.style.width = "100px"
+        startButton.style.color = "white"
+        startButton.style.fontSize = "20px"
     }
 })
 const myVideo = document.createElement('video')
@@ -170,9 +242,12 @@ myPeer.on('open', id =>{
 })
 //START BUTTON
 startButton.addEventListener('click', () => {
+
     socket.emit('start-game', clientArray1)
 })
 socket.on('game-started', array =>{
+    countRounds++
+    playIntro()
     setup()
     if(ID == 0){
         playerName.textContent = "You are the Host"
@@ -191,7 +266,8 @@ socket.on('game-started', array =>{
     }
     clientArray1 = array
     const title = document.createElement('p')
-    title.textContent = "LeaderBoard: "
+    title.id = "leaderboardTitle"
+    title.textContent = "LEADERBOARD "
     leaderBoard.appendChild(title)
     for(i = 1; i < clientArray1.length; i++){ // creates scoreboard for x many players
         const player = document.createElement('p')
@@ -223,6 +299,8 @@ document.getElementById('button-container').addEventListener('click', e => {
     }
 })
 socket.on('score-increased', id => {
+    playClapping()
+    
     const players = document.getElementById('score-board').children //if score increased event happens, 
     let nthChild = 0                                                //increase whoever id's score by 1
     for(i = 0; i < players.length; i ++){
@@ -310,7 +388,7 @@ var myGamePiece;
 var scorep1="0";
 var btn_Sc1 = document.getElementById("Sc_1")
 function setup(){
-    
+
     startGame();
     //p1_dock.style.display="none";
 }
@@ -351,6 +429,22 @@ var myGameArea = {
 myGameArea.canvas.style.zIndex = "1"
 myGameArea.canvas.style.position = "absolute"
 
+function afterq6(){
+    myGameArea.clear();
+    blue_square.width=30;
+    blue_square.height=30;
+    blue_square.angle=0
+    innerSquare.width=30;
+    innerSquare.height=30;
+    innerSquare.angle=0;
+    myGamePiece.width=30;
+    myGamePiece.height=30;
+    myGamePiece.angle=0
+    last_red_Square.width=30;
+    last_red_Square.height=30;
+    last_red_Square.angle=0   
+    myGameArea.start();
+}
 function component(width, height, color, x, y) {
     this.width = width;
     this.height = height;
@@ -507,22 +601,22 @@ function q1_setup(){
          }
      }
      function image_setup_on_q2(){
-  var img = document.getElementById("scream");
+//   var img = document.getElementById("scream");
 
-  img.src="http://commons.wikimedia.org/wiki/Special:FilePath/Amazon%20Kindle%203.JPG";
-  ctx.drawImage(img, 10, 10);
-  console.log("img worked");
+//   img.src="http://commons.wikimedia.org/wiki/Special:FilePath/Amazon%20Kindle%203.JPG";
+//   ctx.drawImage(img, 10, 10);
+//   console.log("img worked");
 }
 function image_setup_on_q3(){
 
-var img = document.getElementById("scream2");
-//img.width=img.width;
-//img.height=img.height;
-img.x=q1_square.x;
+// var img = document.getElementById("scream2");
+// //img.width=img.width;
+// //img.height=img.height;
+// img.x=q1_square.x;
 
-img.src="http://commons.wikimedia.org/wiki/Special:FilePath/President%20Barack%20Obama.jpg";
-ctx.drawImage(img, 10, 10);
-console.log("img worked");
+// img.src="http://commons.wikimedia.org/wiki/Special:FilePath/President%20Barack%20Obama.jpg";
+// ctx.drawImage(img, 10, 10);
+// console.log("img worked");
 }
 
     startButton.onclick=function(){
