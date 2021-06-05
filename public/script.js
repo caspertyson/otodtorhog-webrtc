@@ -2,20 +2,38 @@ const socket = io('/')
 const videoGrid = document.getElementById('video-grid')
 const myPeer = new Peer(undefined, {
     host:'/',
-    proxied: true
+    port: 3001,
 })
 
 let x
+let arrayyy
+let answerSmashArray = [];
+
 fetch(`/database.json`)
     .then(response => response.json())
     .then(data => {
         x = data
-    })
+}).then( () => {
+    let lengthArray = x.AnswerSmash.length
 
+    let numberGenerator = function(arr) { //Generates array with the length of the answersmash
+        if (arr.length >= lengthArray) return;
+        let newNumber = Math.floor(Math.random() * lengthArray);
+        if (arr.indexOf(newNumber) < 0) {
+            arr.push(newNumber);
+        }
+        numberGenerator(arr);
+    };
+
+    numberGenerator(answerSmashArray);
+    console.log(answerSmashArray)
+})
 
 
 
 let state = {}
+
+let myStream;
 
 let playersReader = 0
 const startButton = document.getElementById('start-button')
@@ -30,6 +48,32 @@ let nextQuestion = document.createElement('button')
 nextQuestion.textContent = "Next Question"
 nextQuestion.id = "next_question"
 const playerName = document.getElementById('name-user')
+const muteButton = document.getElementById('mute')
+
+
+function addDescription(text) {
+    let answerSmashDescription = document.createElement('p')
+    answerSmashDescription.id = "description"
+    answerSmashDescription.textContent = text
+    answerSmashDescription.style.zIndex = "999"
+    answerSmashDescription.style.position = "absolute"
+    answerSmashDescription.style.marginLeft = "750px"
+    answerSmashDescription.style.marginTop = "150px"
+    answerSmashDescription.style.fontSize = "20px"
+
+    document.getElementById("body").appendChild(answerSmashDescription)
+}
+
+
+muteButton.addEventListener('click', () =>{
+    myStream.getAudioTracks()[0].enabled = !(myStream.getAudioTracks()[0].enabled)
+    if(myStream.getAudioTracks()[0].enabled){
+        muteButton.style.background = "url(/mute.png)"
+    }
+    else{
+        muteButton.style.background = "url(/unmute.png)"
+    }
+})
 
 let countRounds = 0
 
@@ -40,10 +84,13 @@ let buzzerAudio = new Audio("buzzer.mp3")
 function playBuzzer(){
     buzzerAudio.pause()
     buzzerAudio.src = "buzzer.mp3"
+    buzzerAudio.volume = 0.2
     buzzerAudio.play()
 
 }
 function playIntro(){
+    introMusic.volume = 0.2
+
     introMusic.play()
     setInterval(function() {
         introMusic.pause()
@@ -53,6 +100,8 @@ function playIntro(){
 function playClapping(){
     audio.pause()
     audio.src = "clapping.mp3"
+    audio.volume = 0.2
+
     audio.play()
 
 }
@@ -63,52 +112,53 @@ let clientArray = ["host"]
 let clientArray1 = ["Host"] 
 let ID = 0
 
+let game 
+let questionNo
 
 
 //NEXT QUESTION
 nextQuestion.addEventListener('click', () => {
-    // let x = 0
-    // let object = {};
-    // if(x < 5){
-    //     object ={
-    //         tjg: answer
-    //         g: 
-    //     }
-    // }
-    // else if( x < 10){
-    //     object = {
-
-    //     }
-
-    // }
-    // x++
-    socket.emit('next-question')
+    if(countRounds < 5){
+        questionNo = answerSmashArray[countRounds]
+        game = "AnswerSmash"
+    }
+    const buttons = document.getElementById('button-container').children
+    for(i = 0; i < buttons.length; i++){
+        buttons[i].disabled = false
+    }
+    socket.emit('next-question', questionNo, game)
 })
-socket.on('question-next', () => {
+socket.on('question-next', (questionNo, game) => {
+
     let images = document.getElementsByTagName('img')
+    if(!!document.getElementById('description')){
+        document.getElementById('description').parentNode.removeChild(document.getElementById('description'))
+
+    }
 
     if(countRounds == 5){
         if(images[0] != null){
             images[0].parentNode.removeChild(images[0])
-            images[0].parentNode.removeChild(images[0])
         }
+        title_input = "Where Is Kazakstan"
         afterq6()
     }
     else{
         if(images[0] != null){
             images[0].parentNode.removeChild(images[0])
-            images[0].parentNode.removeChild(images[0])
         }
         state.animate_nq()
 
+
         setTimeout(function(){
-            addImageLeft("http://commons.wikimedia.org/wiki/Special:FilePath/President%20Barack%20Obama.jpg")
+            addImageLeft(x.AnswerSmash[questionNo].item1.image)
         }, 2500)
         setTimeout(function(){
-            addImageRight("http://commons.wikimedia.org/wiki/Special:FilePath/Amazon%20Kindle%203.JPG")
+            addDescription(x.AnswerSmash[questionNo].item2.label)
         }, 2500)
 
     }
+
     countRounds++
 
 
@@ -124,6 +174,7 @@ socket.on('question-next', () => {
             buzzers[i].disabled = false
         }
     }
+
 })
 //BUZZER
 buzzer.addEventListener('click', () => {
@@ -179,12 +230,14 @@ const myVideo = document.createElement('video')
 myVideo.muted = true
 const peers = {}
 
+
 const leaderBoard = document.getElementById('score-board')
 //CONNECT VIDEO 
 navigator.mediaDevices.getUserMedia({
     video: true,
     audio: true
 }).then(stream => {
+    myStream = stream
 
     addVideoStream(myVideo, stream)
 
@@ -196,6 +249,7 @@ navigator.mediaDevices.getUserMedia({
             if(!!document.getElementById('start-button')){
                 startButton.parentNode.removeChild(startButton)
                 scoreContainer.appendChild(readyButton)//removes stuff not needed for players, but needed for host
+                //muteButton.parentNode.removeChild(muteButton)
             }
             addVideoStream(video, userVideoStream)
         })
@@ -222,7 +276,6 @@ startButton.addEventListener('click', () => {
     socket.emit('start-game', clientArray1)
 })
 socket.on('game-started', array =>{
-    countRounds++
     playIntro()
     setup()
     if(ID == 0){
@@ -273,6 +326,10 @@ document.getElementById('button-container').addEventListener('click', e => {
     if(e.target.classList == "score-increase-button"){
         socket.emit('increase-score', id) //if host clicks button, send id of button clicked
     }
+    const buttons = document.getElementById('button-container').children
+    for(i = 0; i < buttons.length; i++){
+        buttons[i].disabled = true
+    }
 })
 socket.on('score-increased', id => {
     playClapping()
@@ -294,6 +351,7 @@ function addVideoStream(video, stream) {
     video.srcObject = stream
     video.addEventListener('loadedmetadata', () =>{
         video.play()
+        
     })
     videoGrid.append(video)
 }
@@ -304,6 +362,7 @@ function connectToNewUser(userId, stream) {
     const call = myPeer.call(userId, stream)
     const video = document.createElement('video')
     const button = document.createElement('button')
+    button.disabled = true
     button.classList.add('score-increase-button')
 
     call.on('stream', userVideoStream => {
@@ -326,6 +385,7 @@ function addImageLeft(url){
     let downloadingImage = new Image()
     downloadingImage.onload = function(){
         img.src = this.src
+
     }
     downloadingImage.src = url
     img.style.width = "200px"
@@ -470,7 +530,7 @@ function component(width, height, color, x, y) {
 
     }
 }
-var title_input="Word Smash!";
+var title_input="Answer Smash!";
 function updateGameArea() {
     if(blue_square.width>436){//us a flag here instead of this
     

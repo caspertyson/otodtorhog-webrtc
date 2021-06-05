@@ -58,8 +58,8 @@ io.on('connection', socket=> {
             io.in(roomId).emit('clicked-buzzer', id)
         })
 
-        socket.on('next-question', () => {
-            io.in(roomId).emit('question-next')
+        socket.on('next-question', (questionNo, game) => {
+            io.in(roomId).emit('question-next', questionNo, game)
         })
 
         socket.on('start-game', array => {
