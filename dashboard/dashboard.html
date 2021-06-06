@@ -15,7 +15,7 @@
 	<section id="games">
 		<section id="AnswerSmash" v-if="currentGame">
 			<h1>Answer Smash</h1>
-			<h3>Pick Categories:</h3>
+			<h3>Pick Categories: (order matters)</h3>
 			Overlap
 			<select v-model="category1"><option v-bind:value="category" v-for="category in Object.keys(this.queries)">{{category}}</option></select>
 			with
@@ -34,29 +34,46 @@
 		</section>
 		<Section id="DistinctlyAverage" v-if="currentGame">
 			<h1>Distinctly Average</h1>
+			<h3>Pick Categories:</h3>
+			<select v-model="query"><option v-bind:value="q" v-for="q in Object.keys(this.queries)">{{q}}</option></select>
+			<button v-on:click="runQueries">Run Queries</button>
 		</Section>
 	</section>
 
 	<section id="results">
 		<h2>Results: {{options.length}}</h2>
 		<div class="overflow">
-			<result 
+			<result
+				v-if="currentGame=='AnswerSmash' || currentGame=='WhereIsKazakhstan'"
 				v-for="item in options"
 				v-bind:option="item"
 			></result>
+			<distinctly-average-result
+				v-if="currentGame=='DistinctlyAverage'"
+				v-for="item in options"
+				v-bind:option="item"
+				v-bind:option="index"				
+			></distinctly-average-result>
 		</div>
 	</section>
 
 	<section id="selected">
 		<h2>Selected: {{selected.length}}</h2>
 		<div class="overflow">
-			<selection 
+			<selection
+				v-if="currentGame=='AnswerSmash' || currentGame=='WhereIsKazakhstan'"
 				v-for="item in selected"
 				v-bind:option="item"
 			></selection>
+			<distinctly-average-selection
+				v-if="currentGame=='DistinctlyAverage'"
+				v-for="item in selected"
+				v-bind:option="item"
+				v-bind:option="index"				
+			></distinctly-average-selection>
 		</div>
+		<button v-on:click="selected=[]">Clear</button>
 		<button v-on:click="save()">Save {{selected.length}} items</button>
-		<a href="/">Return To Game Show</a>
 	</section>
 </body>
 </html>
