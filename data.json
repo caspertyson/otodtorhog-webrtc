@@ -1,0 +1,93 @@
+[
+  {
+    "value": "barack obamazon kindle",
+    "item1": {
+      "label": "barack obama",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/President%20Barack%20Obama.jpg",
+      "description": "44th president of the United States"
+    },
+    "item2": {
+      "label": "amazon kindle",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Amazon%20Kindle%203.JPG",
+      "description": "e-book reading device"
+    }
+  },
+  {
+    "value": "bill gatesla, inc.",
+    "item1": {
+      "label": "bill gates",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Bill%20Gates%202017%20%28cropped%29.jpg",
+      "description": "American business magnate and philanthropist"
+    },
+    "item2": {
+      "label": "tesla, inc.",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Tesla%20Visit%203%20%289267529364%29.jpg",
+      "description": "American automotive, energy storage and solar power company"
+    }
+  },
+  {
+    "value": "miley cyrussian standard",
+    "item1": {
+      "label": "miley cyrus",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Miley%20Cyrus%20Primavera19%20-226%20%2848986293772%29%20%28cropped%29.jpg",
+      "description": "American singer, songwriter and actress"
+    },
+    "item2": {
+      "label": "russian standard",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Russian%20Standard%20Vodka.jpg",
+      "description": "Russian premium vodka brand"
+    }
+  },
+  {
+    "value": "george lucashmere bouquet soap",
+    "item1": {
+      "label": "george lucas",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/George%20Lucas%20cropped%202009.jpg",
+      "description": "American film director, producer and screenwriter"
+    },
+    "item2": {
+      "label": "cashmere bouquet soap",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Only%20one%20soap%20-%20Cashmere%20Bouquet%2C%201948.jpg",
+      "description": null
+    }
+  },
+  {
+    "value": "bruce willisterine",
+    "item1": {
+      "label": "bruce willis",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Bruce%20Willis%20by%20Gage%20Skidmore%203.jpg",
+      "description": "American actor and film producer"
+    },
+    "item2": {
+      "label": "listerine",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Listerine%20products.jpg",
+      "description": "brand of mouthwash"
+    }
+  },
+  {
+    "value": "buzz aldring",
+    "item1": {
+      "label": "buzz aldrin",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Buzz%20Aldrin.jpg",
+      "description": "American astronaut"
+    },
+    "item2": {
+      "label": "ring",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Ring%20video%20doorbell.jpg",
+      "description": "manufacturer of home automation and surveillance products"
+    }
+  },
+  {
+    "value": "nicolas cageman",
+    "item1": {
+      "label": "nicolas cage",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Benjamin%20Gates%20%28et%20le%20Livre%20des%20secrets%29.jpg",
+      "description": "American actor"
+    },
+    "item2": {
+      "label": "ageman",
+      "image": "http://commons.wikimedia.org/wiki/Special:FilePath/Alterssimulationsanzug%20agesuit%20ageman.png",
+      "description": "brand for an agesuit"
+    }
+  }
+]
