@@ -64,7 +64,6 @@ function addDescription(text) {
     document.getElementById("body").appendChild(answerSmashDescription)
 }
 
-
 muteButton.addEventListener('click', () =>{
     myStream.getAudioTracks()[0].enabled = !(myStream.getAudioTracks()[0].enabled)
     if(myStream.getAudioTracks()[0].enabled){
@@ -84,7 +83,7 @@ let buzzerAudio = new Audio("buzzer.mp3")
 function playBuzzer(){
     buzzerAudio.pause()
     buzzerAudio.src = "buzzer.mp3"
-    buzzerAudio.volume = 0.2
+    buzzerAudio.volume = 0.05
     buzzerAudio.play()
 
 }
@@ -95,8 +94,20 @@ function playIntro(){
     setInterval(function() {
         introMusic.pause()
         introMusic.src = "introMusic.mp3"
-    }, 7000)
+    }, 9000)
+    setInterval(function fade(){
+        if(introMusic.volume > 0){
+            introMusic.volume = Math.max(introMusic.volume - 0.003, 0)
+            setTimeout(fade, 20)
+        }else{
+            introMusic.pause()
+            introMusic.src = "introMusic.mp3"
+            return
+        }
+    }, 6000)
 }
+
+
 function playClapping(){
     audio.pause()
     audio.src = "clapping.mp3"
@@ -122,6 +133,7 @@ nextQuestion.addEventListener('click', () => {
         questionNo = answerSmashArray[countRounds]
         game = "AnswerSmash"
     }
+    //else if(count)
     const buttons = document.getElementById('button-container').children
     for(i = 0; i < buttons.length; i++){
         buttons[i].disabled = false
@@ -131,30 +143,27 @@ nextQuestion.addEventListener('click', () => {
 socket.on('question-next', (questionNo, game) => {
 
     let images = document.getElementsByTagName('img')
-    if(!!document.getElementById('description')){
+    if(!!document.getElementById('description')){ //removes description from answersmash
         document.getElementById('description').parentNode.removeChild(document.getElementById('description'))
 
     }
 
-    if(countRounds == 5){
+    if(countRounds == 5){ //Display Graphics after round 5
         if(images[0] != null){
             images[0].parentNode.removeChild(images[0])
         }
         title_input = "Where Is Kazakstan"
         afterq6()
     }
-    else{
+    else{ //if ANSWERSMASH
         if(images[0] != null){
             images[0].parentNode.removeChild(images[0])
         }
         state.animate_nq()
 
 
-        setTimeout(function(){
-            addImageLeft(x.AnswerSmash[questionNo].item1.image)
-        }, 2500)
-        setTimeout(function(){
-            addDescription(x.AnswerSmash[questionNo].item2.label)
+        setTimeout(function(){ //adds Image and Description
+            addImageLeft(x.AnswerSmash[questionNo].item1.image, x.AnswerSmash[questionNo].item2.description)
         }, 2500)
 
     }
@@ -238,6 +247,7 @@ navigator.mediaDevices.getUserMedia({
     audio: true
 }).then(stream => {
     myStream = stream
+    myStream.getAudioTracks()[0].enabled = false
 
     addVideoStream(myVideo, stream)
 
@@ -280,11 +290,6 @@ socket.on('game-started', array =>{
     setup()
     if(ID == 0){
         playerName.textContent = "You are the Host"
-    }
-    if(!document.getElementById('start-button')){
-        // const videoOnScreen = document.getElementById('video-grid').children
-        // videoOnScreen.item(1).style.height = "300px"
-        // videoOnScreen.item(1).style.width = "300px"
     }
     if(!!document.getElementById('start-button')){
         startButton.parentNode.removeChild(startButton)
@@ -380,11 +385,12 @@ function connectToNewUser(userId, stream) {
 }
 
 
-function addImageLeft(url){
+function addImageLeft(url, description){
     let img = document.createElement('img')
     let downloadingImage = new Image()
     downloadingImage.onload = function(){
         img.src = this.src
+        addDescription(description)
 
     }
     downloadingImage.src = url
@@ -393,23 +399,6 @@ function addImageLeft(url){
     img.style.zIndex = "99"
     img.style.position = "absolute"
     img.style.marginLeft = "440px"
-    img.style.marginTop = "75px"
-    img.style.borderRadius = "5px"
-    document.getElementById('body').appendChild(img)
-}
-
-function addImageRight(url){
-    let img = document.createElement('img')
-    let downloadingImage = new Image()
-    downloadingImage.onload = function(){
-        img.src = this.src
-    }
-    downloadingImage.src = url
-    img.style.width = "200px"
-    img.style.height = "200px"
-    img.style.zIndex = "99"
-    img.style.position = "absolute"
-    img.style.marginLeft = "710px"
     img.style.marginTop = "75px"
     img.style.borderRadius = "5px"
     document.getElementById('body').appendChild(img)
