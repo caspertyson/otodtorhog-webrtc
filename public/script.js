@@ -163,7 +163,7 @@ socket.on('question-next', (questionNo, game) => {
 
 
         setTimeout(function(){ //adds Image and Description
-            addImageLeft(x.AnswerSmash[questionNo].item2.image, x.AnswerSmash[questionNo].item1.description)
+            addImageLeft(x.AnswerSmash[questionNo].item1.image, x.AnswerSmash[questionNo].item2.description)
         }, 2500)
 
     }
