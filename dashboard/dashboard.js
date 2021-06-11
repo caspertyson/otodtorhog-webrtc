@@ -40,7 +40,7 @@ let AnswerSmash = new Vue({
 			brands: `
 			SELECT ?item ?itemLabel ?itemDescription ?image{{
 				SELECT ?item ?itemLabel ?itemDescription (MIN(?img) as ?image) WHERE {
-				  ?item wdt:P31 wd:Q431289. OPTIONAL{?item wdt:P18 ?img.}
+				  ?item wdt:P31 wd:Q431289; wdt:P18 ?img.
 				  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 				}
 				GROUP BY ?item ?itemLabel ?image ?itemDescription
@@ -51,7 +51,7 @@ let AnswerSmash = new Vue({
 			foods: `
 			SELECT ?item ?itemLabel ?itemDescription ?image{{
 				SELECT ?item ?itemLabel (MIN(?img) as ?image) WHERE {
-				?item wdt:P31/wdt:P279* wd:Q2095. OPTIONAL{?item wdt:P18 ?img.}
+				?item wdt:P31/wdt:P279* wd:Q209; wdt:P18 ?img.
 				SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 				}
 				GROUP BY ?item ?itemLabel ?itemDescription ?fame ?image

@@ -9,7 +9,7 @@ let x
 let arrayyy
 let answerSmashArray = [];
 
-fetch(`/database.json`)
+fetch(`/database`)
     .then(response => response.json())
     .then(data => {
         x = data
