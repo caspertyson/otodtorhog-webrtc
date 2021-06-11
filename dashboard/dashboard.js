@@ -142,6 +142,48 @@ let DistinctlyAverage = new Vue({
 	el: '#DistinctlyAverage',
 	data: {
 		currentGame: false,
+		query: 'countries',
+		queries: {
+			countries: `
+				SELECT DISTINCT ?itemLabel (MAX(?Inception) as ?inception) ?lifeExpectancy ?population ?area ?retirementAge ?medianIncome
+				{
+					?item wdt:P31 wd:Q6256.
+					OPTIONAL {?item wdt:P571 ?Inception.}
+					OPTIONAL {?item wdt:P2250 ?lifeExpectancy.}
+					OPTIONAL {?item wdt:P1082 ?population.}
+					OPTIONAL {?item wdt:P2046 ?area.}
+					OPTIONAL {?item wdt:P3001 ?retirementAge.}
+					OPTIONAL {?item wdt:P3529 ?medianIncome.}
+					SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+				}
+				GROUP BY ?item ?itemLabel ?inception ?lifeExpectancy ?population ?area ?retirementAge ?medianIncome
+				ORDER BY ?itemLabel
+			`,
+		}
+	},
+	methods: {
+		async runQueries(){
+			//change the cursor to a waiting cursor
+			document.body.style.cursor = 'wait';
+
+			const response = await wikidataQuery(this.queries[this.query])
+			let vars = response.head.vars
+			let bindings = response.results.bindings
+
+			let options = []
+			for(b of bindings){
+				let obj = {}
+				for(v of vars){
+					obj[v] = b[v]?.value
+				}
+				options.push(obj)
+			}
+
+			results.$data.options = options
+
+			//return the cursor back to normal
+			document.body.style.cursor = 'default';
+		}
 	}
 })
 
@@ -160,7 +202,13 @@ let gameSelection = new Vue({
 	methods: {
 		changeGame(game){
 			selectedGame = game
+			results.$data.currentGame = game
+			selected.$data.currentGame = game
 			for(key of Object.keys(games)) games[key].$data.currentGame = key == game ? true : false
+
+			//clear the results and selected
+			results.$data.options = []
+			selected.$data.selected = []
 		}
 	}
 })
@@ -171,15 +219,31 @@ Vue.component('result',{
 	template: '<div class="option"><input type="button" value="+" v-on:click="add(option)"><p>{{option.answer}} ({{option.item1.label}}, {{option.item2.label}})</p></div>'
 })
 
+Vue.component('distinctly-average-result',{
+	props: ['option', 'index'],
+	template: `
+	<div class="option"><input type="button" value="+" v-on:click="add(option)">
+		<p>{{option.itemLabel}}</p>
+		<p>{{index}}</p>
+	</div>`
+})
+
 let results = new Vue({
 	el: '#results',
-	data:{
+	data: {
+		currentGame: 'AnswerSmash',
 		options: [{value:'asdasd', item1:{label:'item1'}, item2:{label:'item2'}}],
-	},
+	}
 })
 
 function add(item){
 	selected.$data.selected.push(item)
+
+	//also remove it from the results
+	var index = results.$data.options.indexOf(item);
+	if (index !== -1) {
+		results.$data.options.splice(index, 1);
+	}
 }
 
 function remove(item){
@@ -195,20 +259,27 @@ Vue.component('selection',{
 	template: '<div class="option"><input type="button" value="-" v-on:click="remove(option)"><p>{{option.value}} ({{option.item1.label}}, {{option.item2.label}})</p></div>'
 })
 
+Vue.component('distinctly-average-selection',{
+	props: ['option'],
+	template: '<div class="option"><input type="button" value="-" v-on:click="remove(option)"><p>{{option.itemLabel}}</p></div>'
+})
+
 let selected = new Vue({
 	el: '#selected',
 	data:{
+		currentGame: 'AnswerSmash',
 		selected: [],
 	},
 })
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch#supplying_request_options
+//sends a post request to /database
 async function save(){
-	const url = '/dashboard'
+	const url = '/database'
 	
 	const headers = {
 		'Content-Type': 'application/json',
-		'filename': selectedGame
+		'game': selectedGame
 	}
 	const response = await fetch(url, {
 		method: 'POST',

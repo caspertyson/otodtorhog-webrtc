@@ -12,7 +12,7 @@ app.use(express.static('./dashboard'))
 app.use(express.json())
 
 function loadDatabase(){
-	return fs.existsSync('./dashboard/database.json') ? JSON.parse(fs.readFileSync('./database.json', 'utf-8')) : {} //loads the database into a variable
+	return fs.existsSync('./database.json') ? JSON.parse(fs.readFileSync('./database.json', 'utf-8')) : {} //loads the database into a variable
 }
 
 //sends the dashboard.html file when they goto /dashboard
@@ -20,15 +20,18 @@ app.get('/dashboard', (request, response) => {
 	response.sendFile(`dashboard.html`, {root: __dirname + '/dashboard'})
 })
 
+//returns the database.json file when the server gets a request to /database
+app.get('/database', (request, response) => response.json(loadDatabase()))
+
 //saves the request body as a json file
-app.post('/dashboard', (request, response) => {
-	const fileName = request.headers.filename
+app.post('/database', (request, response) => {
+	const game = request.headers.game
 	const receivedJSON = request.body
 
 	//adds to database
 	let database = loadDatabase()//loads the database into a variable
-	database[fileName] = receivedJSON //updates the relevant section of the database
-	fs.writeFileSync('./dashboard/database.json', JSON.stringify(database)) //writes database to json file
+	database[game] = receivedJSON //updates the relevant section of the database
+	fs.writeFileSync('./database.json', JSON.stringify(database)) //writes database to json file
 
 	console.log('Database updated')
 	response.send('Success')
