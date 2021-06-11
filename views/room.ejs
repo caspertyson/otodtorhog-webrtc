@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIDEO CHAAAAAAT</title>
+    <title>VIDEO CHAT</title>
     <script>
         const ROOM_ID = "<%= roomId %>"
     </script>
     <script defer src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <script src="/socket.io/socket.io.js" defer></script>
-    <script type="text/javascript" src="json.json" ></script>
     <script src="script.js" defer></script>
     <style>
         body{
@@ -84,6 +83,13 @@
         #next_question{
             background-color: red;
         }
+        #mute{
+            background: url("/unmute.png") no-repeat;
+            background-position: center;
+            width: 50px;
+            height: 50px;
+            margin-top: 50px;
+        }
     </style>
 </head>
 <body id="body">
@@ -97,6 +103,7 @@
     <div id="button-container"></div>
     <div id="score-container">
         <button id="start-button">Waiting For Players</button>
+        <button id="mute"></button>
     </div>
 
 </body>
