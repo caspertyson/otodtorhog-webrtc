@@ -1,3 +1,4 @@
+//Function that sends query to Wikidata SPARQL endpoint and returns json response
 async function wikidataQuery(query){
 	const url = `https://query.wikidata.org/sparql?query=${encodeURI(query)}&format=json`
 	let response = await (await fetch(url)).json()
@@ -228,6 +229,7 @@ Vue.component('distinctly-average-result',{
 	</div>`
 })
 
+//The results list
 let results = new Vue({
 	el: '#results',
 	data: {
@@ -236,6 +238,7 @@ let results = new Vue({
 	}
 })
 
+//adds item from results list to the selected list 
 function add(item){
 	selected.$data.selected.push(item)
 
@@ -246,6 +249,7 @@ function add(item){
 	}
 }
 
+//removes a selected item
 function remove(item){
 	//https://stackoverflow.com/questions/3954438/how-to-remove-item-from-array-by-value
 	var index = selected.$data.selected.indexOf(item);
@@ -264,6 +268,7 @@ Vue.component('distinctly-average-selection',{
 	template: '<div class="option"><input type="button" value="-" v-on:click="remove(option)"><p>{{option.itemLabel}}</p></div>'
 })
 
+//list of selected items
 let selected = new Vue({
 	el: '#selected',
 	data:{
@@ -279,7 +284,7 @@ async function save(){
 	
 	const headers = {
 		'Content-Type': 'application/json',
-		'game': selectedGame
+		'game': selectedGame //custom request header so that the server knows which game to update in the database
 	}
 	const response = await fetch(url, {
 		method: 'POST',
