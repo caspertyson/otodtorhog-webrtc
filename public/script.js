@@ -8,7 +8,7 @@ const myPeer = new Peer(undefined, {
 let x
 let arrayyy
 let answerSmashArray = [];
-
+//gets JSON object
 fetch(`/database`)
     .then(response => response.json())
     .then(data => {
@@ -16,7 +16,7 @@ fetch(`/database`)
 }).then( () => {
     let lengthArray = x.AnswerSmash.length
 
-    let numberGenerator = function(arr) { //Generates array with the length of the answersmash
+    let numberGenerator = function(arr) { //Generates random number array with the length of the answersmash
         if (arr.length >= lengthArray) return;
         let newNumber = Math.floor(Math.random() * lengthArray);
         if (arr.indexOf(newNumber) < 0) {
@@ -51,7 +51,7 @@ const playerName = document.getElementById('name-user')
 const muteButton = document.getElementById('mute')
 
 
-function addDescription(text) {
+function addDescription(text) {//Method to add text to answersmash game
     let answerSmashDescription = document.createElement('p')
     answerSmashDescription.id = "description"
     answerSmashDescription.textContent = text
@@ -63,11 +63,11 @@ function addDescription(text) {
 
     document.getElementById("body").appendChild(answerSmashDescription)
 }
-
+//method to mute stream audio
 muteButton.addEventListener('click', () =>{
     myStream.getAudioTracks()[0].enabled = !(myStream.getAudioTracks()[0].enabled)
     if(myStream.getAudioTracks()[0].enabled){
-        muteButton.style.background = "url(/mute.png)"
+        muteButton.style.background = "url(/mute.png)"//swaps photo around, depending if muted or not
     }
     else{
         muteButton.style.background = "url(/unmute.png)"
@@ -95,7 +95,7 @@ function playIntro(){
         introMusic.pause()
         introMusic.src = "introMusic.mp3"
     }, 9000)
-    setInterval(function fade(){
+    setInterval(function fade(){ //method to fade out end of audio (after 6000 ms)
         if(introMusic.volume > 0){
             introMusic.volume = Math.max(introMusic.volume - 0.003, 0)
             setTimeout(fade, 20)
@@ -129,12 +129,11 @@ let questionNo
 
 //NEXT QUESTION
 nextQuestion.addEventListener('click', () => {
-    if(countRounds < 5){
-        questionNo = answerSmashArray[countRounds]
-        game = "AnswerSmash"
+    if(countRounds < 5){ //if still answersmash game
+        questionNo = answerSmashArray[countRounds]///pick random number
     }
     //else if(count)
-    const buttons = document.getElementById('button-container').children
+    const buttons = document.getElementById('button-container').children//enable all buttons
     for(i = 0; i < buttons.length; i++){
         buttons[i].disabled = false
     }
@@ -157,14 +156,14 @@ socket.on('question-next', (questionNo, game) => {
     }
     else{ //if ANSWERSMASH
         if(images[0] != null){
-            images[0].parentNode.removeChild(images[0])
+            images[0].parentNode.removeChild(images[0])//remove image
         }
         state.animate_nq()
 
 
         setTimeout(function(){ //adds Image and Description
             addImageLeft(x.AnswerSmash[questionNo].item1.image, x.AnswerSmash[questionNo].item2.description)
-        }, 2500)
+        }, 2500)//calls function to add photo and description
 
     }
 
@@ -173,12 +172,12 @@ socket.on('question-next', (questionNo, game) => {
 
     const players = document.getElementsByClassName('player')
     for(i = 0; i < players.length; i++){
-        players[i].textContent = clientArray1[i + 1]
+        players[i].textContent = clientArray1[i + 1]//create/update leaderboard
         players[i].style.color = "black"
         playerClickedNo = 0
     }
     if(ID != 0){
-        const buzzers = document.getElementById('score-container').children
+        const buzzers = document.getElementById('score-container').children//enabled buzzers again after round is over
         for(i = 0; i < buzzers.length; i++){
             buzzers[i].disabled = false
         }
@@ -193,7 +192,7 @@ buzzer.addEventListener('click', () => {
 let playerClickedNo = 0
 socket.on('clicked-buzzer', identity => {
     playBuzzer()
-    const buzzedPlayer = document.getElementById(identity)
+    const buzzedPlayer = document.getElementById(identity) //sets player who buzzed = to if they were the first second or third to buzz in
     if(playerClickedNo == 0){
         playerClickedNo++
         buzzedPlayer.textContent = buzzedPlayer.textContent + '      1'
@@ -225,8 +224,8 @@ socket.on('ready-user', (name, ID) => {
     playersReader++
     startButton.textContent = "Waiting for Players. " + playersReader + " player/s is/are ready."
     if(playersReader == (clientArray.length - 1)){
-        startButton.disabled = false
-        startButton.textContent = "START"
+        startButton.disabled = false //gives start button image, and enables start buttton
+        startButton.textContent = "START"//only if all players are ready
         startButton.style.background = "url(LOGO.jpg)"
         startButton.style.backgroundPosition = "center"
         startButton.style.height = "100px"
@@ -249,19 +248,19 @@ navigator.mediaDevices.getUserMedia({
     myStream = stream
     myStream.getAudioTracks()[0].enabled = false
 
-    addVideoStream(myVideo, stream)
+    addVideoStream(myVideo, stream) //add own stream
 
-    myPeer.on('call', call =>{
-        call.answer(stream)
+    myPeer.on('call', call =>{ //someone else calls, get their call object
+        call.answer(stream) //give our stream to caller
         const video = document.createElement('video')
-        call.on('stream', userVideoStream => {
+        call.on('stream', userVideoStream => { //gets callers stream
             //host will not execute this code. if start button exists, remove it
             if(!!document.getElementById('start-button')){
                 startButton.parentNode.removeChild(startButton)
                 scoreContainer.appendChild(readyButton)//removes stuff not needed for players, but needed for host
                 //muteButton.parentNode.removeChild(muteButton)
             }
-            addVideoStream(video, userVideoStream)
+            addVideoStream(video, userVideoStream) //puts callers stream onto webpage
         })
         ID = ID + 1
     })
@@ -271,14 +270,14 @@ navigator.mediaDevices.getUserMedia({
 })
 socket.on('user-disconnected', userId => {
     if (peers[userId]) peers[userId].close()
-    for(i = 0; i < clientArray.length; i++){
+    for(i = 0; i < clientArray.length; i++){ //removes disconnected user, and removes same user from array
         if(clientArray[i] == userId){
             clientArray.splice(i, 1)
         }
     }
 })
 myPeer.on('open', id =>{
-    socket.emit('join-room', ROOM_ID, id)
+    socket.emit('join-room', ROOM_ID, id) //on open event, emit a join room request
 })
 //START BUTTON
 startButton.addEventListener('click', () => {
@@ -286,8 +285,8 @@ startButton.addEventListener('click', () => {
     socket.emit('start-game', clientArray1)
 })
 socket.on('game-started', array =>{
-    playIntro()
-    setup()
+    playIntro()//music
+    setup()//graphics
     if(ID == 0){
         playerName.textContent = "You are the Host"
     }
@@ -337,23 +336,23 @@ document.getElementById('button-container').addEventListener('click', e => {
     }
 })
 socket.on('score-increased', id => {
-    playClapping()
+    playClapping()//audio
     
     const players = document.getElementById('score-board').children //if score increased event happens, 
     let nthChild = 0                                                //increase whoever id's score by 1
-    for(i = 0; i < players.length; i ++){
+    for(i = 0; i < players.length; i ++){//finds player to increase
         if(players.item(i).id == id){
             nthChild = i
             console.log(nthChild)
         }
     }
     let y = parseInt(players.item(nthChild).textContent)
-    y += 1
+    y += 1 //increases score by one
     players.item(nthChild).textContent = y
 })
 //CONNECTION
-function addVideoStream(video, stream) {
-    video.srcObject = stream
+function addVideoStream(video, stream) { //function called when adding stream to a video object
+    video.srcObject = stream 
     video.addEventListener('loadedmetadata', () =>{
         video.play()
         
@@ -361,7 +360,7 @@ function addVideoStream(video, stream) {
     videoGrid.append(video)
 }
 const buttonContainer = document.getElementById('button-container')
-function connectToNewUser(userId, stream) {
+function connectToNewUser(userId, stream) { //add people's video who join after you join
     clientArray.push(userId)
 
     const call = myPeer.call(userId, stream)
@@ -385,7 +384,7 @@ function connectToNewUser(userId, stream) {
 }
 
 
-function addImageLeft(url, description){
+function addImageLeft(url, description){ //function to add image and description at the same time
     let img = document.createElement('img')
     let downloadingImage = new Image()
     downloadingImage.onload = function(){
