@@ -408,16 +408,16 @@ function addImageLeft(url, description){ //function to add image and description
 
 
 
-var myGamePiece;
-var scorep1="0";
+var myGamePiece;//declaring some variables
+var scorep1="0";//used to be a counter for holding score
 var btn_Sc1 = document.getElementById("Sc_1")
-function setup(){
+function setup(){//compartmentalized set up code can have extra code here
 
     startGame();
     //p1_dock.style.display="none";
 }
 function startGame() {
-    myGamePiece = new component(30, 30, "rgba(220,9,16,255)", myGameArea.canvas.width*2.25, 175);
+    myGamePiece = new component(30, 30, "rgba(220,9,16,255)", myGameArea.canvas.width*2.25, 175);//making instances of the component object
     innerSquare = new component(30, 30, "rgba(220,9,16,255)", myGameArea.canvas.width*2.25, 175);
     last_red_Square = new component(30, 30, "rgba(220,9,16,255)", myGameArea.canvas.width*2.25, 175);
     blue_square = new component(30, 30, "rgba(14,190,213,255)", myGameArea.canvas.width*2.25, 175);
@@ -428,21 +428,21 @@ function startGame() {
 
 
 
-var myGameArea = {
+var myGameArea = {//canvas that allows for display
     canvas : document.createElement("canvas"),
 
     start : function() {
-        this.canvas.width = screen.width;//1355 is what we want
-        this.canvas.height = screen.height*0.457;//351 is what we want
+        this.canvas.width = screen.width;//adaptive display for all device screens
+        this.canvas.height = screen.height*0.457;
         this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, scoreContainer.nextSibling);
+        document.body.insertBefore(this.canvas, scoreContainer.nextSibling);//position on page
         this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 5);//should be 5
+        this.interval = setInterval(updateGameArea, 5);//infinitely carry out updategameare every 5 miliseconds
     },
-    stop : function() {
+    stop : function() {//cease the interval call
         clearInterval(this.interval);
     },    
-    clear : function() {
+    clear : function() {//clear the canvas
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     },
     continue: function(){
@@ -450,10 +450,10 @@ var myGameArea = {
         this.timeout=setTimeout(updateGameArea, 30);
     }
 }
-myGameArea.canvas.style.zIndex = "1"
+myGameArea.canvas.style.zIndex = "1"//positional values
 myGameArea.canvas.style.position = "absolute"
 
-function afterq6(){
+function afterq6(){//after a number of questions the next round has to start so this is the resetter
     myGameArea.clear();
     blue_square.width=30;
     blue_square.height=30;
@@ -469,16 +469,16 @@ function afterq6(){
     last_red_Square.angle=0   
     myGameArea.start();
 }
-function component(width, height, color, x, y) {
-    this.width = width;
+function component(width, height, color, x, y) {//function constructor
+    this.width = width;//applies the recieved parameters
     this.height = height;
     this.angle = 0;
     this.x = x;
     this.y = y;    
-    this.update = function(a) {//added a to test if it can run without parameter requirement being filled
-        ctx = myGameArea.context;
-        ctx.save();
-        ctx.translate(this.x, this.y);        
+    this.update = function(a) {//runs without the parameter passed in
+        ctx = myGameArea.context;//the parameter decides how to animate
+        ctx.save();//save point for ctx.restore
+        ctx.translate(this.x, this.y);//transformations/movements/modifications       
         ctx.rotate(this.angle);
         ctx.fillStyle = color;
         ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);  
@@ -497,7 +497,7 @@ function component(width, height, color, x, y) {
             ctx.strokeRect((this.width / -2), this.height / -2, this.width, this.height);
             
         }
-        else{
+        else{//red square
             ctx.lineWidth=10;
             ctx.strokeStyle="rgba(117,2,10,255)";   //this is inner border dark and thick
             ctx.strokeRect(this.width / -2, this.height / -2, this.width, this.height);  
@@ -507,27 +507,27 @@ function component(width, height, color, x, y) {
         }
         ctx.restore();    
     }
-    this.insertTitle=function(left, top, size, text){
+    this.insertTitle=function(left, top, size, text){//allows for insertion of text given reference points
         console.log("text add ran");
         ctx.font = size+"px Arial";
         ctx.fillStyle ="white";
         //ctx.textBaseline = "hanging";
         ctx.textAlign = "center";
-        ctx.fillText(text, left, top);
+        ctx.fillText(text, left, top);//fancy lettering to match the show
         ctx.strokeText(text, left, top);
 
     }
 }
 var title_input="Answer Smash!";
 function updateGameArea() {
-    if(blue_square.width>436){//us a flag here instead of this
-    
+    if(blue_square.width>436){//using size helps for testing purposes if(blue_square.angle<-Math.PI*(3/4)could also be used
+                               //this is the ending scenario where the animation is stopped
         myGameArea.stop();
         blue_square.insertTitle(blue_square.x, blue_square.y,55,title_input);
-        //console.log("there is inf loop here");
+        //console.log("there is error at inserting title");
     }
     else{
-        myGameArea.clear();
+        myGameArea.clear();//grow size and angle/clear and generate new drawings to animate
         myGamePiece.angle += 1 * Math.PI / 180;   
         myGamePiece.width+=3;
         myGamePiece.height+=3;
@@ -541,21 +541,21 @@ function updateGameArea() {
         innerSquare.width+=3;
         innerSquare.height+=3;
          // console.log(innerSquare.x);
-        // console.log("there is inf loop here");
+        // console.log("there is inf loop here at the rotation of red square");
         innerSquare.update(); 
-        if(innerSquare.angle>Math.PI/2){
+        if(innerSquare.angle>Math.PI/2){//start animating the last red square
             last_red_Square.angle += 1 * Math.PI / 180;   
             last_red_Square.width+=3;
             last_red_Square.height+=3;
-            //  console.log(last_red_Square.width);
+            //  console.log("last_red_Square is erroring here");
             console.log("there is inf loop here");
             last_red_Square.update(); 
-                 if(last_red_Square.angle>Math.PI/2){
+                 if(last_red_Square.angle>Math.PI/2){//start animating the blue square
                     blue_square.angle -= 1 * Math.PI / 180;   
                     blue_square.width+=3;
                     blue_square.height+=3;
                    //   console.log(blue_square.width);
-                  // console.log("there is inf loop here");
+                  // console.log("animating the blue square is errored");
                     blue_square.update(2);     
                     //console.log("there is inf loop here");             
                 }
@@ -563,9 +563,9 @@ function updateGameArea() {
     } 
 }
 
-var tt=1;
+var tt=1;//transformation timer that acts as a flag
 
-state = {
+state = {//using the initialised variable above so that timer can be accesed as avariables in a  function cannot
     animate_nq: function (){
         q1_square.width = 0
         q1_square.height = 0
@@ -575,11 +575,11 @@ state = {
         q2_square.height = 0
         q2_square.angle = 2
 
-        console.log("error");
-        tt=1;
+        console.log("animating next q");
+        tt=1;//allowing subsequent presses of the button to start from step 1
         innerSquare.update();
         q1_square.update(3);
-        var q1_timer = setInterval(q1_setup, 10);
+        var q1_timer = setInterval(q1_setup, 10);//start the animation, this is the timer that has to be cleared
         // q1_square.angle=-0.017453292519943295;
         //q2_square.angle=-0.017453292519943295;
         console.log(q1_square.angle);
@@ -588,25 +588,25 @@ state = {
 
 
 function q1_setup(){
-    if(q1_square.angle>-(Math.PI/2)&&tt==1)
+    if(q1_square.angle>-(Math.PI/2)&&tt==1)//flags
     {
     q1_square.angle-= 1 * Math.PI / 180;//make sure to put angle first then size
     q1_square.width+=1;
     q1_square.height+=1;
 
-    innerSquare.update();//updating both squares here is the trick to get rid of remaining border
-    q1_square.update(3);
+    innerSquare.update();//updating background to imitate animation instead of clearing.//as clering clears the whole thing
+    q1_square.update(3);//updating both squares here is the trick to get rid of remaining border
     console.log(q1_square.angle);
     }
     else if(q1_square.angle<=(-Math.PI/2)&&tt==1){
     console.log("there is inf loop here");
-    clearInterval(state.q1_timer);
-    tt++;
+    clearInterval(state.q1_timer);//stop the first animation
+    tt++;//make sure the first flag is set to false by increasing tt
     q2_square.update(3);
-    var q2_timer = setInterval(q2_setup, 5)
+    var q2_timer = setInterval(q2_setup, 5)//start the next animation
     }
 }
-     function q2_setup(){
+     function q2_setup(){//similar to q1 setup
          if(q2_square.angle>-(Math.PI/2)&&tt==2)
          {
             q2_square.angle-= 1 * Math.PI / 180;//make sure to put angle first then size
@@ -616,7 +616,7 @@ function q1_setup(){
             q1_square.update(3);
             q2_square.update(3);
          }
-         else if(q2_square.angle<=(-Math.PI/2)&&tt==2){
+         else if(q2_square.angle<=(-Math.PI/2)&&tt==2){//experimenting with showing images
             tt=0;
             clearInterval(q1_setup.q2_timer);
             console.log("there is inf loop here");          
@@ -643,7 +643,7 @@ function image_setup_on_q3(){
 // console.log("img worked");
 }
 
-    startButton.onclick=function(){
+    startButton.onclick=function(){//event that starts the round
     var timerId = setInterval(nextRound, 5)
     }
 
@@ -651,23 +651,23 @@ function image_setup_on_q3(){
     var n_R_Counter=0;
     function nextRound(){
        
-       if(n_R_Counter>=100 && n_R_Counter<101){
+       if(n_R_Counter>=100 && n_R_Counter<101){//uses a counter as a flag to zoom in/ stops after 100 updates
         innerSquare.update();
         console.log(n_R_Counter);
-        n_R_Counter++;
+        n_R_Counter++;//counter increase once per loop
         clearInterval(startButton.timerId);
        }
        else if(n_R_Counter<100){
-            innerSquare.width++;
+            innerSquare.width++;//size increase by 1 per update
             innerSquare.height++;
             innerSquare.update();
-            blue_square.width-=4.5;
+            blue_square.width-=4.5;//size decrease by 4.5 per update
             blue_square.height-=4.5;
             
             blue_square.update(2);
-            //console.log("tried to inc size")
+            //console.log("tried to play with size")
             n_R_Counter++;
-           // console.log(n_R_Counter);
+           // console.log(n_R_Counter+"is the zoom counter");
             console.log("minimizer");
        }
        // clearInterval(this.interval);
